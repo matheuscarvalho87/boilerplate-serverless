@@ -1,31 +1,54 @@
+# 🚀 Serverless Node.js Boilerplate
 
-# WHAT IS
+## 📌 What is this?
+A boilerplate to simplify the creation of **Node.js** serverless projects using the **Serverless Framework** and **Middy** for request handling.
 
- - Boilerplate to make easier create node.js serverless projects
- - Using Middy to handle requests
+## ✅ Features Implemented
+- [x] **Lambda Functions**
+- [x] **Cognito Authentication**
+  - Sign-up
+  - Sign-in
+  - Refresh token
+  - Confirm account
+  - Forgot password
+  - Reset password
+- [x] **Cognito Authorizer**
+- [ ] **S3 Configuration** *(In Progress)*
+- [ ] **File Upload** *(In Progress)*
+- [x] **Users Management**
+  - Retrieve user information
+- [ ] **DynamoDB Integration** *(To be done)*
+- [ ] **SQS Integration** *(To be done)*
 
-# UNTIL NOW
-[x] Lambda functions
-[x] Cognito configuration
-- Sign-up
-- Sign-in
-- Refresh token
-- Confirm Account
-- Forgot password
-- Reset password
-[x] Cognito Authorizer
-[] S3 basic config
-[] Upload files (doing)
+## 🚀 How to Use
+1. Configure AWS CLI with your credentials:
+   ```sh
+   aws configure
+   ```
+2. Install the **Serverless Framework**:
+   ```sh
+   npm install -g serverless
+   ```
+3. Update `serverless.yml`:
+   - Replace **`changeHere`** with a meaningful name for your service.
+4. Deploy your application:
+   ```sh
+   sls deploy
+   ```
 
-[x] Users
-- Get user information
+## 📌 Technologies Used
+- **Node.js**
+- **AWS Lambda**
+- **AWS Cognito**
+- **AWS S3** (Planned)
+- **AWS DynamoDB** (Planned)
+- **AWS SQS** (Planned)
+- **Middy**
+- **Serverless Framework**
 
-[] DynamoDB
-[] SQS
+## 📜 License
+This project is licensed under the **MIT License**.
 
-# TO USE
+---
 
-- Config AWS CLI with your credentials
-- Install serverless cli
-- Change in serverless.yml where 'changeHere' for another name
-- run sls deploy
+🎯 *Contributions are welcome! Feel free to submit issues and pull requests.*
