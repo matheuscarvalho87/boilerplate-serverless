@@ -1,0 +1,125 @@
+org: someOrgName ## change-here
+app: someAppName ## change-here
+service: someServiceName ## change-here
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  architecture: arm64
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: cognito-idp:AdminGetUser
+          Resource: !GetAtt YourProjectName.Arn ## change-here
+  environment:
+    AWS_COGNITO_CLIENT_ID: !Ref YourProjectNameClient ## change-here
+    AWS_COGNITO_USER_POOL_ID: !Ref YourProjectName ## change-here
+  httpApi:
+    authorizers:
+      CognitoAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: !GetAtt YourProjectName.ProviderURL ## change-here
+        audience:
+          - !Ref YourProjectNameClient ## change-here
+package:
+  individually: true
+
+build:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: false
+    exclude:
+      - '@aws-sdk/*'
+
+resources:
+  Resources:
+    YourProjectName: ## change-here
+      Type : AWS::Cognito::UserPool
+      Properties:
+        DeletionProtection: ACTIVE
+        UserPoolName: YourProjectName ## change-here
+        MfaConfiguration: "OFF"
+        AutoVerifiedAttributes:
+          - email
+        AdminCreateUserConfig:
+          AllowAdminCreateUserOnly: false
+        UsernameAttributes:
+          - email
+        AccountRecoverySetting:
+          RecoveryMechanisms:
+            - Name: verified_email
+              Priority: 1
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: false
+            RequireUppercase: true
+            RequireSymbols: true
+            RequireNumbers: true
+            TemporaryPasswordValidityDays: 2
+        Schema:
+          - Name: given_name
+            Mutable: true
+            Required: true
+            AttributeDataType: String
+          - Name: family_name
+            Mutable: true
+            Required: true
+            AttributeDataType: String
+    YourProjectNameClient: ## change-here
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: YourProjectNameClient ## change-here
+        UserPoolId: !Ref YourProjectName ## change-here
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+        TokenValidityUnits:
+          AccessToken: hours
+          RefreshToken: hours
+        AccessTokenValidity: 3
+        RefreshTokenValidity: 1440 #60 days
+functions:
+  signUp:
+    handler: src/main/functions/auth.handler
+    events:
+      - httpApi:
+          path: /auth/sign-up
+          method: ANY
+      - httpApi:
+          path: /auth/sign-in
+          method: ANY
+      - httpApi:
+          path: /auth/confirm-account
+          method: ANY
+      - httpApi:
+          path: /auth/refresh-token
+          method: ANY
+      - httpApi:
+          path: /auth/forgot-password
+          method: ANY
+      - httpApi:
+          path: /auth/reset-password
+          method: ANY
+
+
+  upload:
+    handler: src/main/functions/upload.handler
+    events:
+      - httpApi:
+          path: /upload
+          method: POST
+          authorizer:
+            name: CognitoAuthorizer
+  users:
+    handler: src/main/functions/users.handler
+    events:
+      - httpApi:
+          path: /users/me
+          method: ANY
+          authorizer:
+            name: CognitoAuthorizer
